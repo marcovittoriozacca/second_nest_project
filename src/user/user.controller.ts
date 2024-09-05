@@ -1,9 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { UserService } from './user.service';
+import { User } from '@prisma/client';
 
 @Controller('users')
 export class UserController {
+  constructor(private userService: UserService) {}
+
   @Get('/')
-  getAllUsers() {
-    return [{ user: 1 }, { user: 2 }, { user: 3 }];
+  async getUsers(): Promise<User[]> {
+    return this.userService.getUsers();
+  }
+
+  @Get('/:id')
+  async getSingleUser(@Param() id: string): Promise<User> {
+    return this.userService.getSingleUser(id);
   }
 }
