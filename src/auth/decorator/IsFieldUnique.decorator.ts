@@ -19,8 +19,6 @@ export class IsFieldUniqueConstraint implements ValidatorConstraintInterface {
     const check = await prisma[collection].findUnique({
       where: { [field]: value },
     });
-    console.log(check);
-
     if (!check) {
       return true;
     }

@@ -39,7 +39,4 @@ export class SignupDto {
   @IsString()
   @IsStrongPassword()
   password: string;
-
-  @IsOptional()
-  post?: [];
 }
