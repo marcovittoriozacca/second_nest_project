@@ -6,6 +6,7 @@ import {
   IsStrongPassword,
   Length,
 } from 'class-validator';
+import { IsFieldUnique } from '../decorator';
 
 class Fullname {
   @IsOptional()
@@ -26,10 +27,12 @@ export class SignupDto {
   @IsNotEmpty()
   @IsString()
   @Length(3, 20)
+  @IsFieldUnique('username', 'user')
   username: string;
 
   @IsNotEmpty()
   @IsEmail()
+  @IsFieldUnique('email', 'user')
   email: string;
 
   @IsNotEmpty()

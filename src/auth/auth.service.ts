@@ -7,9 +7,7 @@ import { SignupDto } from './dto';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
 
-  async signup(dto: SignupDto) {
-    return console.log(dto);
-  }
+  async signup(dto: SignupDto) {}
 
   async signin() {
     return;
