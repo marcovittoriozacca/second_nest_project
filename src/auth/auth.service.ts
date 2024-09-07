@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SignupDto } from './dto';
+import { SigninDto, SignupDto } from './dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -27,15 +27,32 @@ export class AuthService {
         sub: user.id,
         username: user.username,
       });
-      console.log(access_token);
       return { access_token };
     } catch (err) {
       throw err;
     }
   }
 
-  async signin() {
-    return;
+  async signin(dto: SigninDto): Promise<{ access_token: string }> {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+      console.log(dto.password, user.password);
+      const isPasswordCorrect = await argon.verify(user.password, dto.password);
+
+      if (!isPasswordCorrect) {
+        throw new BadRequestException('Email or Password incorrect');
+      }
+
+      const token = await this.signToken(
+        { sub: user.id, username: user.username },
+        '5h',
+      );
+      return { access_token: token };
+    } catch (err) {
+      throw err;
+    }
   }
 
   async signToken(

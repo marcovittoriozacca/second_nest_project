@@ -13,16 +13,28 @@ const prisma = new PrismaClient();
 @ValidatorConstraint({ async: true })
 export class IsFieldUniqueConstraint implements ValidatorConstraintInterface {
   async validate(value: any, args?: ValidationArguments): Promise<boolean> {
-    const [field, collection] = args.constraints;
+    const [field, collection, reverse = false] = args.constraints;
 
     //@ts-ignore
     const check = await prisma[collection].findUnique({
       where: { [field]: value },
     });
-    if (!check) {
-      return true;
+
+    if (!reverse) {
+      if (!check) {
+        return true;
+      } else {
+        return false;
+      }
     }
-    return false;
+
+    if (reverse) {
+      if (!check) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   }
   defaultMessage(args?: ValidationArguments): string {
     return `${args.value} is already taken`;
@@ -32,6 +44,7 @@ export class IsFieldUniqueConstraint implements ValidatorConstraintInterface {
 export function IsFieldUnique(
   field: string,
   collection: string,
+  reverse?: boolean,
   validationOptions?: ValidationOptions,
 ) {
   return function (object: Object, propertyName: string) {
@@ -39,7 +52,7 @@ export function IsFieldUnique(
       target: object.constructor,
       propertyName,
       options: validationOptions,
-      constraints: [field, collection],
+      constraints: [field, collection, reverse],
       validator: IsFieldUniqueConstraint,
     });
   };

@@ -40,3 +40,13 @@ export class SignupDto {
   @IsStrongPassword()
   password: string;
 }
+
+export class SigninDto {
+  @IsNotEmpty()
+  @IsEmail()
+  @IsFieldUnique('email', 'user', true, { message: '$value doesnt exits' })
+  email: string;
+
+  @IsNotEmpty()
+  password: string;
+}
