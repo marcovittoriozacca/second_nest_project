@@ -12,14 +12,15 @@ import { PostService } from './post.service';
 import { JwtAuthGuard } from 'src/auth/guard';
 import { CreatePostDto } from './dto';
 import { Request } from 'express';
+import { AllPostsInterface } from './interface';
 import { Post as PostCollection } from '@prisma/client';
 
 @Controller('posts')
 export class PostController {
   constructor(private postService: PostService) {}
   @Get('/')
-  async getAllPosts() {
-    return;
+  async getAllPosts(): Promise<AllPostsInterface[]> {
+    return this.postService.getAllPosts();
   }
 
   @Get('/:postId')

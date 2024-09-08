@@ -2,15 +2,27 @@ import { Injectable, InternalServerErrorException, Req } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from './dto';
+import { AllPostsInterface } from './interface';
 
 @Injectable()
 export class PostService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllPosts(): Promise<Post[]> {
-    //this is only an example of the returned value - not finished
-    //@ts-ignore
-    return [{ id: 1 }, { id: 2 }, { id: 3 }];
+  async getAllPosts(): Promise<AllPostsInterface[]> {
+    try {
+      return await this.prisma.post.findMany({
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          image: true,
+          createdAt: true,
+          authorId: true,
+        },
+      });
+    } catch (err) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   async getPostById(): Promise<Post> {
