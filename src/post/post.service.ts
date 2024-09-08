@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, Req } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreatePostDto } from './dto';
 
 @Injectable()
 export class PostService {
@@ -15,19 +16,35 @@ export class PostService {
   async getPostById(): Promise<Post> {
     //this is only an example of the returned value - not finished
     //@ts-ignore
-    return [{ id: 1 }];
+    return { id: 1 };
   }
 
-  async createNewPost(): Promise<Post> {
-    //this is only an example of the returned value - not finished
-    //@ts-ignore
-    return [{ new_post: true }];
+  async createNewPost(dto: CreatePostDto, id: string): Promise<Post> {
+    try {
+      const user = await this.prisma.user.update({
+        where: { id },
+        data: {
+          post: {
+            create: [{ ...dto }],
+          },
+        },
+        include: {
+          post: true,
+        },
+      });
+
+      return user.post[user.post.length - 1];
+    } catch (err) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+
+    return;
   }
 
   async updatePost(): Promise<Post> {
     //this is only an example of the returned value - not finished
     //@ts-ignore
-    return [{ updated_post: true }];
+    return { updated_post: true };
   }
 
   async deletePost(): Promise<{ success: boolean }> {
