@@ -55,6 +55,7 @@ export class PostService {
   }
 
   async createNewPost(dto: PostDto, id: string): Promise<Post> {
+    console.log(id);
     try {
       const user = await this.prisma.user.update({
         where: { id },

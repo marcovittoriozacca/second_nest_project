@@ -12,7 +12,7 @@ export class UserController {
   }
 
   @Get('/:id')
-  async getSingleUser(@Param() id: string): Promise<User> {
+  async getSingleUser(@Param('id') id: string): Promise<User> {
     return this.userService.getSingleUser(id);
   }
 }

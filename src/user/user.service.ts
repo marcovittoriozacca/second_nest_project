@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
@@ -37,8 +39,27 @@ export class UserService {
       const user = await this.prisma.user.findUnique({
         where: { id },
       });
+
+      if (!user) {
+        throw new NotFoundException(`The user with id: ${id} doesn't exist`);
+      }
       return user;
     } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2015') {
+          throw new NotFoundException({
+            message: `The user with id: ${id} doesn't exist`,
+            statusCode: HttpStatus.NOT_FOUND,
+          });
+        }
+        if (err.code === 'P2023') {
+          throw new BadRequestException({
+            message: `${id} is not a valid id - provide a 12 byte string`,
+            statusCode: HttpStatus.BAD_REQUEST,
+          });
+        }
+      }
+      console.error(err);
       throw err;
     }
   }
