@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
   Put,
   Req,
@@ -24,8 +25,10 @@ export class PostController {
   }
 
   @Get('/:postId')
-  async getPostById() {
-    return;
+  async getPostById(
+    @Param('postId') id: string,
+  ): Promise<Partial<PostCollection>> {
+    return this.postService.getPostById(id);
   }
 
   @UseGuards(JwtAuthGuard)

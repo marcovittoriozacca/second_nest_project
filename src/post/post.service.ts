@@ -1,8 +1,15 @@
-import { Injectable, InternalServerErrorException, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  Req,
+} from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from './dto';
 import { AllPostsInterface } from './interface';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class PostService {
@@ -25,10 +32,27 @@ export class PostService {
     }
   }
 
-  async getPostById(): Promise<Post> {
-    //this is only an example of the returned value - not finished
-    //@ts-ignore
-    return { id: 1 };
+  async getPostById(id: string): Promise<Partial<Post>> {
+    try {
+      const post = await this.prisma.post.findUnique({
+        where: { id },
+      });
+      delete post.updatedAt;
+      return post;
+    } catch (err) {
+      if (err instanceof PrismaClientKnownRequestError) {
+        if (err.code === 'P2025') {
+          throw new NotFoundException(`The element with id: ${id} is missing`);
+        }
+        if (err.code === 'P2023') {
+          throw new BadRequestException(
+            `The id: ${id} provided is wrong. Must be exactly 12 bytes`,
+          );
+        }
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+    return;
   }
 
   async createNewPost(dto: CreatePostDto, id: string): Promise<Post> {
