@@ -52,7 +52,6 @@ export class PostService {
       }
       throw new InternalServerErrorException('Internal Server Error');
     }
-    return;
   }
 
   async createNewPost(dto: PostDto, id: string): Promise<Post> {
@@ -73,8 +72,6 @@ export class PostService {
     } catch (err) {
       throw new InternalServerErrorException('Internal Server Error');
     }
-
-    return;
   }
 
   async updatePost(dto: PostDto, id: string): Promise<Post> {
@@ -85,7 +82,7 @@ export class PostService {
       });
       return updatedPost;
     } catch (err) {
-      console.error(err);
+      throw err;
     }
   }
 
@@ -97,9 +94,7 @@ export class PostService {
 
       return { success: true };
     } catch (err) {
-      console.log(err);
       throw err;
     }
-    return { success: true };
   }
 }
