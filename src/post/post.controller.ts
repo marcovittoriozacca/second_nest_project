@@ -41,14 +41,13 @@ export class PostController {
     const { id } = req.user as { id: string };
     return this.postService.createNewPost(dto, id);
   }
-  //must add a guards that checks the token and checks if the post is associated with the user or not
+
   @UseGuards(JwtAuthGuard, CheckPostOwner)
   @Put('/:postId')
   async updatePost(@Param('postId') id: string, @Body() dto: PostDto) {
     return this.postService.updatePost(dto, id);
   }
 
-  //must add a guards that checks the token and checks if the post is associated with the user or not
   @UseGuards(JwtAuthGuard, CheckPostOwner)
   @Delete('/:postId')
   async deletePost(@Param('postId') id: string): Promise<{ success: boolean }> {
