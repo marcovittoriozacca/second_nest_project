@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { Post } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePostDto } from './dto';
+import { PostDto } from './dto';
 import { AllPostsInterface } from './interface';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
@@ -55,7 +55,7 @@ export class PostService {
     return;
   }
 
-  async createNewPost(dto: CreatePostDto, id: string): Promise<Post> {
+  async createNewPost(dto: PostDto, id: string): Promise<Post> {
     try {
       const user = await this.prisma.user.update({
         where: { id },
@@ -77,10 +77,16 @@ export class PostService {
     return;
   }
 
-  async updatePost(): Promise<Post> {
-    //this is only an example of the returned value - not finished
-    //@ts-ignore
-    return { updated_post: true };
+  async updatePost(dto: PostDto, id: string): Promise<Post> {
+    try {
+      const updatedPost = this.prisma.post.update({
+        where: { id },
+        data: dto,
+      });
+      return updatedPost;
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   async deletePost(id: string): Promise<{ success: boolean }> {

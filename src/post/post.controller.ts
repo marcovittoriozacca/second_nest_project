@@ -11,11 +11,11 @@ import {
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAuthGuard } from 'src/auth/guard';
-import { CreatePostDto } from './dto';
 import { Request } from 'express';
 import { AllPostsInterface } from './interface';
 import { Post as PostCollection } from '@prisma/client';
 import { CheckPostOwner } from './guard';
+import { PostDto } from './dto';
 
 @Controller('posts')
 export class PostController {
@@ -36,16 +36,16 @@ export class PostController {
   @Post('/')
   async createNewPost(
     @Req() req: Request,
-    @Body() dto: CreatePostDto,
+    @Body() dto: PostDto,
   ): Promise<PostCollection> {
     const { id } = req.user as { id: string };
     return this.postService.createNewPost(dto, id);
   }
   //must add a guards that checks the token and checks if the post is associated with the user or not
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, CheckPostOwner)
   @Put('/:postId')
-  async updatePost() {
-    return;
+  async updatePost(@Param('postId') id: string, @Body() dto: PostDto) {
+    return this.postService.updatePost(dto, id);
   }
 
   //must add a guards that checks the token and checks if the post is associated with the user or not

@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { Observable } from 'rxjs';
@@ -33,11 +34,14 @@ export class CheckPostOwner implements CanActivate {
         );
       }
       if (post.authorId !== userId) {
-        return false;
+        throw new ForbiddenException({
+          statusCode: 403,
+          message: 'You do not have permission to perform this action',
+          error: 'Forbidden',
+        });
       }
       return true;
     } catch (err) {
-      console.log(err);
       if (err instanceof PrismaClientKnownRequestError) {
         if (err.code === 'P2023') {
           throw new BadRequestException(
@@ -45,6 +49,7 @@ export class CheckPostOwner implements CanActivate {
           );
         }
       }
+      throw err;
     }
   }
 }
