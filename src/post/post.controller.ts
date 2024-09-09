@@ -51,7 +51,7 @@ export class PostController {
   //must add a guards that checks the token and checks if the post is associated with the user or not
   @UseGuards(JwtAuthGuard, CheckPostOwner)
   @Delete('/:postId')
-  async deletePost(@Param('postId') id: string) {
+  async deletePost(@Param('postId') id: string): Promise<{ success: boolean }> {
     return this.postService.deletePost(id);
   }
 }
