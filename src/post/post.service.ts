@@ -83,9 +83,17 @@ export class PostService {
     return { updated_post: true };
   }
 
-  async deletePost(): Promise<{ success: boolean }> {
-    //this is only an example of the returned value - not finished
-    //@ts-ignore
+  async deletePost(id: string): Promise<{ success: boolean }> {
+    try {
+      await this.prisma.post.delete({
+        where: { id },
+      });
+
+      return { success: true };
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
     return { success: true };
   }
 }

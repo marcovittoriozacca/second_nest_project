@@ -38,7 +38,6 @@ export class AuthService {
       const user = await this.prisma.user.findUnique({
         where: { email: dto.email },
       });
-      console.log(dto.password, user.password);
       const isPasswordCorrect = await argon.verify(user.password, dto.password);
 
       if (!isPasswordCorrect) {

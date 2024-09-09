@@ -15,6 +15,7 @@ import { CreatePostDto } from './dto';
 import { Request } from 'express';
 import { AllPostsInterface } from './interface';
 import { Post as PostCollection } from '@prisma/client';
+import { CheckPostOwner } from './guard';
 
 @Controller('posts')
 export class PostController {
@@ -48,8 +49,9 @@ export class PostController {
   }
 
   //must add a guards that checks the token and checks if the post is associated with the user or not
+  @UseGuards(JwtAuthGuard, CheckPostOwner)
   @Delete('/:postId')
-  async deletePost() {
-    return;
+  async deletePost(@Param('postId') id: string) {
+    return this.postService.deletePost(id);
   }
 }
